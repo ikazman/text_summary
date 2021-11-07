@@ -2,8 +2,7 @@ import string
 from heapq import nlargest
 
 import nltk
-from nltk import word_tokenize
-from nltk import sent_tokenize
+from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as nltk_stopwords
 
 nltk.download('wordnet')
