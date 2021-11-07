@@ -4,6 +4,10 @@ from heapq import nlargest
 import nltk
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as nltk_stopwords
+from nltk.stem import SnowballStemmer
+from pymystem3 import Mystem
+
+russian_stemmer = SnowballStemmer('russian')
 
 nltk.download('wordnet')
 nltk.download('stopwords')
@@ -14,6 +18,7 @@ class Summary:
     """Класс для процессинга текста и получения результата."""
 
     def __init__(self, text):
+        self.mystem = Mystem()
         self.text = text
         self.processed_text = None
         self.summary_length = 1
@@ -26,7 +31,7 @@ class Summary:
         берем десятую часть, иначе - одно предолжение"""
         num_of_sentences = self.text.count('. ')
         if num_of_sentences > 20:
-            self.summary_length = int(round(num_of_sentences / 10, 0))
+            self.summary_length = int(round(num_of_sentences / 5, 0))
         else:
             self.summary_length = 1
 
@@ -38,6 +43,19 @@ class Summary:
         self.processed_text = [word for word in text_without_punct.split()
                                if word.lower()
                                not in nltk_stopwords.words('russian')]
+
+    def lemmatize_and_stem_text(self):
+        """Лемматизируем и выделим корень из слов в тексте
+        для повышения качества."""
+        temp_text = ' '.join(self.processed_text.copy())
+        lemmas = self.mystem.lemmatize(temp_text)
+        self.processed_text = [russian_stemmer.stem(lemma) for lemma in lemmas]
+
+    def lemmatize_and_stem(self, word):
+        """Лемматизируем и выделим корень из одного слова."""
+        lemma = self.mystem.lemmatize(word)
+        stemmed_word = russian_stemmer.stem(lemma[0])
+        return stemmed_word
 
     def count_word_frequency(self):
         """Подсчитываем частоту слов в тексте."""
@@ -57,7 +75,8 @@ class Summary:
         """Подсчитываем важность предложений."""
         sentence_list = sent_tokenize(self.text)
         for sentence in sentence_list:
-            for word in word_tokenize(sentence.lower()):
+            sentence_lem = self.lemmatize_and_stem(sentence)
+            for word in word_tokenize(sentence_lem.lower()):
                 if word in self.word_frequency.keys():
                     if sentence not in self.sent_scores.keys():
                         self.sent_scores[sentence] = self.word_frequency[word]
@@ -69,6 +88,7 @@ class Summary:
         частоты слов."""
         self.define_summary_length()
         self.clean_text()
+        self.lemmatize_and_stem_text()
         self.count_word_frequency()
         self.normilize_word_frequency()
         self.count_sentenses_score()
