@@ -4,7 +4,6 @@ from heapq import nlargest
 import nltk
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as nltk_stopwords
-from nltk.corpus.reader import sentiwordnet
 from nltk.stem import SnowballStemmer
 from pymystem3 import Mystem
 
@@ -33,8 +32,6 @@ class Summary:
         num_of_sentences = self.text.count('. ')
         if num_of_sentences > 20:
             self.summary_length = int(round(num_of_sentences / 10, 0))
-        else:
-            self.summary_length = 1
 
     def clean_text(self):
         """Очищаем текст от знаков препинаний и стоп-слов."""
