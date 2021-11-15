@@ -16,7 +16,7 @@ def main():
         summary_name = ''.join(text_name.split('.')[0] + '_summary' + '.txt')
         with open(file_path + file, 'r', encoding='utf-8') as input_file:
             text = input_file.read()
-        processed_text = pipe.Summary(text)
+        processed_text = pipe.Summary(text, file)
         processed_text.get_summary()
         with open(summary_name, 'w', encoding='utf-8') as output_file:
             output_file.write(processed_text.summary)  
