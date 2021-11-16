@@ -8,6 +8,7 @@ load_dotenv()
 
 
 class TextSummarization:
+    """Класс для чтения текста и получения резюме."""
 
     def __init__(self):
         self.path = os.environ.get('PATH_TO_FILE')
@@ -16,9 +17,12 @@ class TextSummarization:
         self.summaries_path = self.path + '/summaries/'
 
     def already_summarized(self, path, summary_name):
+        """Проверяем существование резюме для текста."""
         return summary_name in os.listdir(path + '/summaries/')
 
     def summary(self):
+        """Открываем файл, проверяем есть ли резюме для текста,
+        создаем резюме - если его нет."""
         for file in self.files:
             text_path = self.texts_path + file
             summary_name = file.split('.')[0] + '_summary' + '.txt'
