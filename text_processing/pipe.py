@@ -4,15 +4,14 @@ from heapq import nlargest
 import nltk
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as nltk_stopwords
-from nltk.corpus.reader import sentiwordnet
 from nltk.stem import SnowballStemmer
 from pymystem3 import Mystem
 
 russian_stemmer = SnowballStemmer('russian')
 
-nltk.download('wordnet')
-nltk.download('stopwords')
-nltk.download('punkt')
+nltk.download('wordnet', quiet=True, raise_on_error=True)
+nltk.download('stopwords', quiet=True, raise_on_error=True)
+nltk.download('punkt', quiet=True, raise_on_error=True)
 
 
 class Summary:
@@ -31,11 +30,13 @@ class Summary:
     def define_summary_length(self):
         """Определяем длину резюме: для текста длинее 20 предложений
         берем десятую часть, иначе - одно предолжение"""
-        print(f'Резюме для текста {self.file_name}.')
+        print(f'\nРезюме для текста {self.file_name}.')
         print('Определяем число предложений для резюме.')
         num_of_sentences = self.text.count('. ')
         if num_of_sentences > 20:
             self.summary_length = int(round(num_of_sentences / 10, 0))
+        elif num_of_sentences > 9:
+            self.summary_length = 3
         else:
             self.summary_length = 1
         print(f'Число предложений в резюме: {self.summary_length}.')
@@ -106,3 +107,4 @@ class Summary:
         self.summary = ' '.join(nlargest(self.summary_length,
                                          self.sent_scores,
                                          key=self.sent_scores.get))
+        print(f'Резюме для {self.file_name} готово.\n' + '-------------------')

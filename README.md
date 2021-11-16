@@ -23,14 +23,14 @@ $ pip install --upgrade pip
 ```bash
 $ pip install -r requirements.txt
 ```
-3) Поместить файлы с текстами в формате txt в папку texts_and_summaries
+3) Поместить файлы с текстами в формате txt в папку texts_and_summaries/texts/
 4) Создать файл .env в котором указать полный путь до папки texts_and_summaries
 ```bash
 PATH_TO_FILE='/home/ikazman/Documents/GitHub/text_summary/texts_and_summaries' # пример
 ```
 5) Запустить скрипт:
 ```bash
-$ python text_summarization.py 
+$ python get_summary.py 
 ```
 
-Результат будет в папке texts_and_summaries.
+Результат будет в папке texts_and_summaries/summaries.
