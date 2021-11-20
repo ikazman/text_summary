@@ -1,5 +1,6 @@
-from text_summarization import text_summarization
 import time
+
+from text_summarization import text_summarization
 
 if __name__ == '__main__':
     start = time.time()
