@@ -20,6 +20,7 @@ pytz==2021.3
 regex==2021.11.2
 requests==2.26.0
 six==1.16.0
+sklearn
 toml==0.10.2
 tqdm==4.62.3
 typing_extensions==4.0.0
