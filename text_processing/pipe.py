@@ -33,6 +33,7 @@ class Summary:
         self.sentences = 0
         self.sent_scores = {}
         self.summary = None
+        self.summary_ordered = None
         self.file_name = file
 
     def define_summary_length(self):
@@ -82,7 +83,7 @@ class Summary:
             self.word_frequency[word] += 1
 
     def count_sentences_with_word(self):
-        """Подсчитываем важность предложений."""
+        """Подсчитываем число предложений в котором встречается слово."""
         print('Подсчитываем обратную частоту.\n')
         sentence_list = sent_tokenize(self.text, language='russian')
         self.sentences = len(sentence_list)
@@ -93,33 +94,46 @@ class Summary:
                     self.word_frequency_by_sentence[word] += 1
 
     def normilize_word_frequency(self):
-        """Нормализуем частоту слов - диапозон от 0 до 1"""
+        """Нормализуем частоту слов - диапозон от 0 до 1."""
         print('Нормализуем частоту слов - диапозон от 0 до 1.')
         max_freq = max(self.word_frequency.values())
         for word in self.word_frequency.keys():
             self.word_frequency[word] = self.word_frequency[word] / max_freq
 
     def tf_ifd_score(self):
+        """Подсчитываем TF-IDF."""
         for word in self.word_frequency.keys():
-            print('WORD - ', word)
-            print(self.word_frequency[word])
-            print(self.word_frequency_by_sentence[word])
             if self.word_frequency_by_sentence[word] > 0:
-                self.word_frequency[word] = abs(math.log((self.word_frequency[word] / len(self.processed_text)) * self.word_frequency_by_sentence[word], 10))
-            print(self.word_frequency[word])
+                idf = self.sentences / self.word_frequency_by_sentence[word]
+                self.word_frequency[word] = abs(
+                    math.log(idf, 10)) * self.word_frequency[word]
 
     def count_sentenses_score(self):
         """Подсчитываем важность предложений."""
         print('Подсчитываем важность предложений.\n')
         sentence_list = sent_tokenize(self.text, language='russian')
-        for sentence in sentence_list:
-            sentence_lem = self.lemmatize_and_stem(sentence.lower())
+        for sentence in enumerate(sentence_list):
+            sentence_lem = self.lemmatize_and_stem(sentence[1].lower())
             for word in word_tokenize(sentence_lem, language='russian'):
                 if word in self.word_frequency.keys():
                     if sentence not in self.sent_scores.keys():
                         self.sent_scores[sentence] = self.word_frequency[word]
                     else:
                         self.sent_scores[sentence] += self.word_frequency[word]
+
+    def fixing_sentences_order(self):
+        """Собираем самые важные предложения."""
+        temp = ['Резюме с порядком предложений по важности:\n\n']
+        self.summary = nlargest(self.summary_length,
+                                self.sent_scores,
+                                key=self.sent_scores.get)
+        self.summary_ordered = sorted(self.summary, key=lambda x: x[0])
+        for sentence in self.summary:
+            temp.append(sentence[1])
+        temp.append('\n\nРезюме с оригинальным порядком предложений:\n\n')
+        for sentence in self.summary_ordered:
+            temp.append(sentence[1])
+        self.summary = ' '.join(temp)
 
     def get_summary(self):
         """Получаем резюме из текста: самые важные предложения исходя из
@@ -132,7 +146,5 @@ class Summary:
         self.tf_ifd_score()
         self.normilize_word_frequency()
         self.count_sentenses_score()
-        self.summary = ' '.join(nlargest(self.summary_length,
-                                         self.sent_scores,
-                                         key=self.sent_scores.get))
+        self.fixing_sentences_order()
         print(f'Резюме для {self.file_name} готово.\n' + '-------------------')
